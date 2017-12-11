@@ -9,8 +9,8 @@ class MenuState extends Phaser.State {
 
     create() {
         game.stage.backgroundColor = "#3A2E3F";
-        // UP, Over, Down
-        var btnPlay = game.add.button(game.world.centerX, game.world.centerY, 'btnPlay', this.actionOnClick, this, 0, 0, 0);
+        // last tree params are spriteposition for UP, Over, Down
+        var btnPlay = game.add.button(game.world.centerX, game.world.centerY, 'btnPlay', this.btnPlayOnClick, this, 0, 0, 0);
         btnPlay.anchor.set(0.5, 0.5);
     }
 
@@ -18,7 +18,8 @@ class MenuState extends Phaser.State {
 
     }
 
-    actionOnClick () {
+    btnPlayOnClick () {
         console.log("Clicked");
+        game.state.start("gameState");
     }
 }
