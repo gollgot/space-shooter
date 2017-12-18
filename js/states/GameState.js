@@ -6,6 +6,7 @@ class GameState extends Phaser.State {
     preload(){
         game.load.image('background','img/backgrounds/bg-game.jpg');
         game.load.image('player','img/game/player.png');
+        game.load.image('bullet', 'img/game/bullet.png');
     }
 
     create() {
@@ -26,8 +27,21 @@ class GameState extends Phaser.State {
         this.player.body.maxVelocity.set(200);
         this.player.angle -= 90;
 
+
+        // Create a weapon
+        this.weapon = game.add.weapon(30, 'bullet');
+        //  The bullet will be automatically killed when it leaves the world bounds
+        this.weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+        this.weapon.bulletSpeed = 600;
+        //  Speed-up the rate of fire, allowing them to shoot 1 bullet every 60ms
+        this.weapon.fireRate = 100;
+        //  Tell the Weapon to track the 'player' Sprite | set a little offset | true to track sprite rotation
+        this.weapon.trackSprite(this.player, 50, 0, true);
+
+
         // Create the cursors dor input keyboard
         this.cursors = game.input.keyboard.createCursorKeys();
+        this.fireButton = this.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
 
         // Camera settings
         game.camera.follow(this.player);
@@ -57,6 +71,11 @@ class GameState extends Phaser.State {
         else
         {
             this.player.body.angularVelocity = 0;
+        }
+
+        if (this.fireButton.isDown)
+        {
+            this.weapon.fire();
         }
     }
 }
