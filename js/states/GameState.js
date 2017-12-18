@@ -7,6 +7,7 @@ class GameState extends Phaser.State {
         game.load.image('background','img/backgrounds/bg-game.jpg');
         game.load.image('player','img/game/player.png');
         game.load.image('bullet', 'img/game/bullet.png');
+        game.load.spritesheet('player', 'img/game/player.png', 88, 99, 4); // 5 sprites an each 88 x 99 px
     }
 
     create() {
@@ -21,6 +22,7 @@ class GameState extends Phaser.State {
 
         // Create the player / set the anchor at the center of the sprite / Enable the physics on it / collide with world bounds
         this.player = game.add.sprite(game.world.centerX, game.world.centerY, 'player');
+        this.player.animations.add('propulse', [1, 2, 3]);
         this.player.anchor.set(0.5, 0.5);
         game.physics.enable(this.player, Phaser.Physics.ARCADE);
         this.player.body.collideWorldBounds = true;
@@ -36,7 +38,7 @@ class GameState extends Phaser.State {
         //  Speed-up the rate of fire, allowing them to shoot 1 bullet every 60ms
         this.weapon.fireRate = 100;
         //  Tell the Weapon to track the 'player' Sprite | set a little offset | true to track sprite rotation
-        this.weapon.trackSprite(this.player, 50, 0, true);
+        this.weapon.trackSprite(this.player, 60, 0, true);
 
 
         // Create the cursors dor input keyboard
@@ -50,31 +52,26 @@ class GameState extends Phaser.State {
 
     update(){
         // Accelerate when up key is downs
-        if (this.cursors.up.isDown)
-        {
+        if (this.cursors.up.isDown){
             game.physics.arcade.accelerationFromRotation(this.player.rotation, 800, this.player.body.acceleration);
-        }
-        else
-        {
+            this.player.animations.play('propulse', 30, true); // true for looping when finish
+        }else{
             this.player.body.acceleration.set(0);
+            this.player.frame = 0;
         }
 
         // Rotation left and right
-        if (this.cursors.left.isDown)
-        {
+        if (this.cursors.left.isDown){
             this.player.body.angularVelocity = -300;
-        }
-        else if (this.cursors.right.isDown)
-        {
+        }else if (this.cursors.right.isDown){
             this.player.body.angularVelocity = 300;
-        }
-        else
-        {
+        }else{
             this.player.body.angularVelocity = 0;
         }
 
-        if (this.fireButton.isDown)
-        {
+
+        // Shoot
+        if (this.fireButton.isDown){
             this.weapon.fire();
         }
     }
