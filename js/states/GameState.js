@@ -20,9 +20,11 @@ class GameState extends Phaser.State {
 
         // Create the player / set the anchor at the center of the sprite / Enable the physics on it / collide with world bounds
         this.player = game.add.sprite(game.world.centerX, game.world.centerY, 'player');
-        this.player.anchor.setTo(0.5, 0.5);
+        this.player.anchor.set(0.5, 0.5);
         game.physics.enable(this.player, Phaser.Physics.ARCADE);
         this.player.body.collideWorldBounds = true;
+        this.player.body.maxVelocity.set(200);
+        this.player.angle -= 90;
 
         // Create the cursors dor input keyboard
         this.cursors = game.input.keyboard.createCursorKeys();
@@ -33,25 +35,28 @@ class GameState extends Phaser.State {
     }
 
     update(){
-        //  Reset the players velocity (movement)
-        this.player.body.velocity.x = 0;
-        this.player.body.velocity.y = 0;
+        // Accelerate when up key is downs
+        if (this.cursors.up.isDown)
+        {
+            game.physics.arcade.accelerationFromRotation(this.player.rotation, 800, this.player.body.acceleration);
+        }
+        else
+        {
+            this.player.body.acceleration.set(0);
+        }
 
-        //  Move to the left
-        if (this.cursors.left.isDown){
-            this.player.body.velocity.x = -250;
+        // Rotation left and right
+        if (this.cursors.left.isDown)
+        {
+            this.player.body.angularVelocity = -300;
         }
-        //  Move to the right
-        else if (this.cursors.right.isDown){
-            this.player.body.velocity.x = 250;
+        else if (this.cursors.right.isDown)
+        {
+            this.player.body.angularVelocity = 300;
         }
-        //  Move to the up
-        else if (this.cursors.down.isDown){
-            this.player.body.velocity.y = 250;
-        }
-        //  Move to the down
-        else if (this.cursors.up.isDown){
-            this.player.body.velocity.y = -250;
+        else
+        {
+            this.player.body.angularVelocity = 0;
         }
     }
 }
