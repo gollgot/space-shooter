@@ -5,17 +5,20 @@ class GameState extends Phaser.State {
 
     preload(){
         game.load.image('background','img/backgrounds/bg-game.jpg');
-        game.load.image('player','img/game/player.png');
-        game.load.image('bullet', 'img/game/bullet.png');
         game.load.spritesheet('player', 'img/game/player.png', 88, 99, 4); // 5 sprites an each 88 x 99 px
+        game.load.image('bullet', 'img/game/bullet.png');
+        game.load.image('meteor1','img/game/meteor1.png');
+        game.load.image('meteor2','img/game/meteor2.png');
+        game.load.image('meteor3','img/game/meteor3.png');
+        game.load.image('meteor4','img/game/meteor4.png');
     }
 
     create() {
         // Create the deadzone (zone in center that the player can move)
         this.deadZone = new Phaser.Rectangle(150, 150, 500, 300);
         // Background (all the world)
-        game.add.tileSprite(0, 0, 1920, 1920, 'background');
-        game.world.setBounds(0, 0, 1920, 1920);
+        game.add.tileSprite(0, 0, 1000, 1000, 'background');
+        game.world.setBounds(0, 0, 1000, 1000);
 
         // Start the physics
         game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -29,7 +32,6 @@ class GameState extends Phaser.State {
         this.player.body.maxVelocity.set(200);
         this.player.angle -= 90;
 
-
         // Create a weapon
         this.weapon = game.add.weapon(30, 'bullet');
         //  The bullet will be automatically killed when it leaves the world bounds
@@ -39,6 +41,12 @@ class GameState extends Phaser.State {
         this.weapon.fireRate = 100;
         //  Tell the Weapon to track the 'player' Sprite | set a little offset | true to track sprite rotation
         this.weapon.trackSprite(this.player, 60, 0, true);
+
+         //  Add meteors group
+        this.meteors = game.add.group();
+        this.meteors.enableBody = true;
+        this.meteors.physicsBodyType = Phaser.Physics.ARCADE;
+        this.createMeteors(this.meteors);
 
 
         // Create the cursors dor input keyboard
@@ -51,6 +59,8 @@ class GameState extends Phaser.State {
     }
 
     update(){
+        game.physics.arcade.overlap(this.weapon.bullets, this.meteors, this.hitMeteor, null, this);
+
         // Accelerate when up key is downs
         if (this.cursors.up.isDown){
             game.physics.arcade.accelerationFromRotation(this.player.rotation, 800, this.player.body.acceleration);
@@ -74,5 +84,21 @@ class GameState extends Phaser.State {
         if (this.fireButton.isDown){
             this.weapon.fire();
         }
+    }
+
+    createMeteors(meteors){
+        let totalMeteors = 5;
+        for (var x = 0; x < totalMeteors; x++){
+            let randomNumber = Math.floor(Math.random() * 4) + 1;
+            let meteor = meteors.create(game.world.randomX, game.world.randomY, 'meteor'+randomNumber);
+            game.physics.enable(meteor, Phaser.Physics.ARCADE);
+            meteor.anchor.setTo(0.5, 0.5);
+        }
+    }
+
+    hitMeteor(bullet, meteor){
+        bullet.kill();
+        meteor.kill();
+        console.log("Hit a meteor !");
     }
 }
