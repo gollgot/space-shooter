@@ -59,6 +59,7 @@ class GameState extends Phaser.State {
     }
 
     update(){
+        // Set the collision detection between bullets and meteors
         game.physics.arcade.overlap(this.weapon.bullets, this.meteors, this.hitMeteor, null, this);
 
         // Accelerate when up key is downs
@@ -84,6 +85,17 @@ class GameState extends Phaser.State {
         if (this.fireButton.isDown){
             this.weapon.fire();
         }
+
+        // Meteors update
+        this.meteors.forEachAlive(function(meteor){
+            let newAngle = Math.floor(Math.random() * 2) + 0.5;
+
+            meteor.angle += 1.5;
+            meteor.x = meteor.x + 1;
+            meteor.y = meteor.y + 2;
+            // Reappears at the other side of the world if touch limits
+            self.gameState.screenWrap(meteor);
+        });
     }
 
     createMeteors(meteors){
@@ -99,6 +111,21 @@ class GameState extends Phaser.State {
     hitMeteor(bullet, meteor){
         bullet.kill();
         meteor.kill();
-        console.log("Hit a meteor !");
+        console.log("Hit a meteor at : ("+meteor.x+" ; "+meteor.y+")");
+    }
+
+    // Let the sprite reappears at the other side of the world if he touches the world limit
+    screenWrap(sprite){
+        if (sprite.x < 0){
+            sprite.x = game.world._width;
+        }else if (sprite.x > game.world._width){
+            sprite.x = 0;
+        }
+
+        if (sprite.y < 0){
+            sprite.y = game.world._height;
+        }else if (sprite.y > game.world._height){
+            sprite.y = 0;
+        }
     }
 }
