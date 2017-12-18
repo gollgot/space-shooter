@@ -22,7 +22,7 @@ class GameState extends Phaser.State {
 
         // Create the player / set the anchor at the center of the sprite / Enable the physics on it / collide with world bounds
         this.player = game.add.sprite(game.world.centerX, game.world.centerY, 'player');
-        this.player.animations.add('propulse', [1, 2, 3]);
+        this.player.animations.add('propulse', [1, 2, 3], 30, true); // frames for anim, rate FPS, true for looping
         this.player.anchor.set(0.5, 0.5);
         game.physics.enable(this.player, Phaser.Physics.ARCADE);
         this.player.body.collideWorldBounds = true;
@@ -54,7 +54,7 @@ class GameState extends Phaser.State {
         // Accelerate when up key is downs
         if (this.cursors.up.isDown){
             game.physics.arcade.accelerationFromRotation(this.player.rotation, 800, this.player.body.acceleration);
-            this.player.animations.play('propulse', 30, true); // true for looping when finish
+            this.player.animations.play('propulse'); // true for looping when finish
         }else{
             this.player.body.acceleration.set(0);
             this.player.frame = 0;
