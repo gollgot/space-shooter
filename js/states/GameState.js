@@ -88,11 +88,7 @@ class GameState extends Phaser.State {
 
         // Meteors update
         this.meteors.forEachAlive(function(meteor){
-            let newAngle = Math.floor(Math.random() * 2) + 0.5;
-
-            meteor.angle += 1.5;
-            meteor.x = meteor.x + 1;
-            meteor.y = meteor.y + 2;
+            meteor.update();
             // Reappears at the other side of the world if touch limits
             self.gameState.screenWrap(meteor);
         });
@@ -101,10 +97,8 @@ class GameState extends Phaser.State {
     createMeteors(meteors){
         let totalMeteors = 5;
         for (var x = 0; x < totalMeteors; x++){
-            let randomNumber = Math.floor(Math.random() * 4) + 1;
-            let meteor = meteors.create(game.world.randomX, game.world.randomY, 'meteor'+randomNumber);
-            game.physics.enable(meteor, Phaser.Physics.ARCADE);
-            meteor.anchor.setTo(0.5, 0.5);
+            let meteor = new Meteor();
+            meteors.add(meteor);
         }
     }
 
