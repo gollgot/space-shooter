@@ -11,6 +11,7 @@ class GameState extends Phaser.State {
         game.load.image('meteor2','img/game/meteor2.png');
         game.load.image('meteor3','img/game/meteor3.png');
         game.load.image('meteor4','img/game/meteor4.png');
+        game.load.spritesheet('explosion', 'img/game/explosion.png', 96, 96);
     }
 
     create() {
@@ -105,7 +106,13 @@ class GameState extends Phaser.State {
     hitMeteor(bullet, meteor){
         bullet.kill();
         meteor.kill();
-        console.log("Hit a meteor at : ("+meteor.x+" ; "+meteor.y+")");
+        // Explosion
+        let explosion = game.add.sprite(meteor.x, meteor.y, 'explosion');
+        explosion.anchor.setTo(0.5, 0.5);
+        explosion.scale.setTo(1.5, 1.5);
+        let explode = explosion.animations.add('explode');
+        explode.killOnComplete = true;
+        explosion.animations.play('explode', 20);
     }
 
     // Let the sprite reappears at the other side of the world if he touches the world limit
