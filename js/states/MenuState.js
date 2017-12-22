@@ -4,7 +4,7 @@ class MenuState extends Phaser.State {
     }
 
     preload(){
-        game.load.spritesheet('btnPlay', 'img/buttons/play.png', 195, 50);
+        game.load.spritesheet('btnPlay', 'assets/img/buttons/play.png', 195, 50);
     }
 
     create() {

@@ -4,6 +4,7 @@ class GameState extends Phaser.State {
     }
 
     preload(){
+        // Game images
         game.load.image('background','assets/img/backgrounds/bg-game.jpg');
         game.load.spritesheet('player', 'assets/img/game/player.png', 88, 99, 4); // 5 sprites an each 88 x 99 px
         game.load.image('bullet', 'assets/img/game/bullet.png');
@@ -12,7 +13,10 @@ class GameState extends Phaser.State {
         game.load.image('meteor3','assets/img/game/meteor3.png');
         game.load.image('meteor4','assets/img/game/meteor4.png');
         game.load.spritesheet('explosion', 'assets/img/game/explosion.png', 96, 96);
+        game.load.image('unmuted', 'assets/img/buttons/unmuted.png');
+        game.load.image('muted', 'assets/img/buttons/muted.png');
 
+        // Sounds
         game.load.audio('sound_gameMusic', 'assets/audio/game.mp3');
         game.load.audio('sound_explosion', 'assets/audio/explosion.mp3');
         game.load.audio('sound_blaster', 'assets/audio/blaster.mp3');
@@ -20,10 +24,10 @@ class GameState extends Phaser.State {
 
     create() {
         // Create the deadzone (zone in center that the player can move)
-        this.deadZone = new Phaser.Rectangle(150, 150, 500, 300);
+        this.deadZone = new Phaser.Rectangle(200, 200, 600, 300);
         // Background (all the world)
-        game.add.tileSprite(0, 0, 1000, 1000, 'background');
-        game.world.setBounds(0, 0, 1000, 1000);
+        game.add.tileSprite(0, 0, 1500, 1500, 'background');
+        game.world.setBounds(0, 0, 1500, 1500);
 
         // Start the physics
         game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -57,6 +61,22 @@ class GameState extends Phaser.State {
         // Create the cursors dor input keyboard
         this.cursors = game.input.keyboard.createCursorKeys();
         this.fireButton = this.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
+
+        // Sound and no-sound images
+        this.unmuted = game.add.sprite(953, 15, 'unmuted');
+        this.unmuted.fixedToCamera = true;
+        this.unmuted.inputEnabled = true;
+        this.unmuted.events.onInputDown.add(this.muteTheGame, this);
+
+        this.muted = game.add.sprite(953, 15, 'muted');
+        this.muted.fixedToCamera = true;
+        this.muted.visible = false;
+        this.muted.inputEnabled = true;
+        this.muted.events.onInputDown.add(this.unmuteTheGame, this);
+
+        // Text displayed
+        this.txtScore = game.add.text(15, 15, "Score: 0", { font: "24px Arial", fill:"#FFF",  align: "center" });
+        this.txtScore.fixedToCamera = true;
 
         // Create sounds
         this.sound_gameMusic = game.add.audio('sound_gameMusic');
@@ -145,5 +165,19 @@ class GameState extends Phaser.State {
         }else if (sprite.y > game.world._height){
             sprite.y = 0;
         }
+    }
+
+    muteTheGame(){
+        this.sound_gameMusic.pause();
+        game.sound.mute = true;
+        this.unmuted.visible = false;
+        this.muted.visible = true;
+    }
+
+    unmuteTheGame(){
+        this.sound_gameMusic.resume();
+        game.sound.mute = false;
+        this.unmuted.visible = true;
+        this.muted.visible = false;
     }
 }
