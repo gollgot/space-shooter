@@ -14,7 +14,6 @@ class Gem extends Phaser.Sprite{
     }
 
     update(){
-
     }
 }
 

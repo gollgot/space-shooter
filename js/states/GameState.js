@@ -84,7 +84,8 @@ class GameState extends Phaser.State {
         this.muted.events.onInputDown.add(this.unmuteTheGame, this);
 
         // Text displayed
-        this.txtScore = game.add.text(15, 15, "Score 0", { font: "24px Arial", fill:"#FFF",  align: "center" });
+        this.score = 0;
+        this.txtScore = game.add.text(15, 15, "Score "+this.score, { font: "24px Arial", fill:"#FFF",  align: "center" });
         this.txtScore.fixedToCamera = true;
 
         // Create sounds
@@ -100,13 +101,16 @@ class GameState extends Phaser.State {
         // Camera settings
         game.camera.follow(this.player);
         game.camera.deadzone = this.deadZone;
-
-
     }
 
     update(){
+        // Set the collision detection between gems and player
+        game.physics.arcade.overlap(this.player, this.gems, this.catchGem, null, this);
         // Set the collision detection between bullets and meteors
         game.physics.arcade.overlap(this.weapon.bullets, this.meteors, this.hitMeteor, null, this);
+
+        // Update the score text
+        this.txtScore.setText("Score "+this.score);
 
         // Accelerate when up key is downs
         if (this.cursors.up.isDown){
@@ -167,8 +171,12 @@ class GameState extends Phaser.State {
         let explode = explosion.animations.add('explode');
         explode.killOnComplete = true;
         explosion.animations.play('explode', 20);
-        this.sound_explosion.play('explo');
         this.sound_explosion.play();
+    }
+
+    catchGem(player, gem){
+        gem.kill();
+        this.score += 10;
     }
 
     // Let the sprite reappears at the other side of the world if he touches the world limit
