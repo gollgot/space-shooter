@@ -15,6 +15,7 @@ class GameState extends Phaser.State {
         game.load.spritesheet('explosion', 'assets/img/game/explosion.png', 96, 96);
         game.load.image('unmuted', 'assets/img/buttons/unmuted.png');
         game.load.image('muted', 'assets/img/buttons/muted.png');
+        game.load.spritesheet('gems', 'assets/img/game/gems.png', 80, 80);
 
         // Sounds
         game.load.audio('sound_gameMusic', 'assets/audio/game.mp3');
@@ -28,6 +29,14 @@ class GameState extends Phaser.State {
         // Background (all the world)
         game.add.tileSprite(0, 0, 1500, 1500, 'background');
         game.world.setBounds(0, 0, 1500, 1500);
+
+
+        //  Add gems group
+        this.gems = game.add.group();
+        this.gems.enableBody = true;
+        this.gems.physicsBodyType = Phaser.Physics.ARCADE;
+        this.createGems(this.gems);
+
 
         // Start the physics
         game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -75,7 +84,7 @@ class GameState extends Phaser.State {
         this.muted.events.onInputDown.add(this.unmuteTheGame, this);
 
         // Text displayed
-        this.txtScore = game.add.text(15, 15, "Score: 0", { font: "24px Arial", fill:"#FFF",  align: "center" });
+        this.txtScore = game.add.text(15, 15, "Score 0", { font: "24px Arial", fill:"#FFF",  align: "center" });
         this.txtScore.fixedToCamera = true;
 
         // Create sounds
@@ -91,6 +100,8 @@ class GameState extends Phaser.State {
         // Camera settings
         game.camera.follow(this.player);
         game.camera.deadzone = this.deadZone;
+
+
     }
 
     update(){
@@ -135,6 +146,14 @@ class GameState extends Phaser.State {
         for (var x = 0; x < totalMeteors; x++){
             let meteor = new Meteor();
             meteors.add(meteor);
+        }
+    }
+
+    createGems(gems){
+        let totalGems = 10;
+        for (var x = 0; x < totalGems; x++){
+            let gem = new Gem();
+            gems.add(gem);
         }
     }
 
