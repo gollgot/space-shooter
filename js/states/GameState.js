@@ -4,14 +4,17 @@ class GameState extends Phaser.State {
     }
 
     preload(){
-        game.load.image('background','img/backgrounds/bg-game.jpg');
-        game.load.spritesheet('player', 'img/game/player.png', 88, 99, 4); // 5 sprites an each 88 x 99 px
-        game.load.image('bullet', 'img/game/bullet.png');
-        game.load.image('meteor1','img/game/meteor1.png');
-        game.load.image('meteor2','img/game/meteor2.png');
-        game.load.image('meteor3','img/game/meteor3.png');
-        game.load.image('meteor4','img/game/meteor4.png');
-        game.load.spritesheet('explosion', 'img/game/explosion.png', 96, 96);
+        game.load.image('background','assets/img/backgrounds/bg-game.jpg');
+        game.load.spritesheet('player', 'assets/img/game/player.png', 88, 99, 4); // 5 sprites an each 88 x 99 px
+        game.load.image('bullet', 'assets/img/game/bullet.png');
+        game.load.image('meteor1','assets/img/game/meteor1.png');
+        game.load.image('meteor2','assets/img/game/meteor2.png');
+        game.load.image('meteor3','assets/img/game/meteor3.png');
+        game.load.image('meteor4','assets/img/game/meteor4.png');
+        game.load.spritesheet('explosion', 'assets/img/game/explosion.png', 96, 96);
+
+        game.load.audio('sound_explosion', 'assets/audio/explosion.mp3');
+        game.load.audio('sound_blaster', 'assets/audio/blaster.mp3');
     }
 
     create() {
@@ -54,6 +57,10 @@ class GameState extends Phaser.State {
         this.cursors = game.input.keyboard.createCursorKeys();
         this.fireButton = this.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
 
+        // Create sounds
+        this.sound_explosion = game.add.audio('sound_explosion');
+        this.sound_blaster = game.add.audio('sound_blaster');
+
         // Camera settings
         game.camera.follow(this.player);
         game.camera.deadzone = this.deadZone;
@@ -85,6 +92,7 @@ class GameState extends Phaser.State {
         // Shoot
         if (this.fireButton.isDown){
             this.weapon.fire();
+            this.sound_blaster.play();
         }
 
         // Meteors update
@@ -113,6 +121,8 @@ class GameState extends Phaser.State {
         let explode = explosion.animations.add('explode');
         explode.killOnComplete = true;
         explosion.animations.play('explode', 20);
+        this.sound_explosion.play('explo');
+        this.sound_explosion.play();
     }
 
     // Let the sprite reappears at the other side of the world if he touches the world limit
