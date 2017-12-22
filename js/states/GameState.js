@@ -13,6 +13,7 @@ class GameState extends Phaser.State {
         game.load.image('meteor4','assets/img/game/meteor4.png');
         game.load.spritesheet('explosion', 'assets/img/game/explosion.png', 96, 96);
 
+        game.load.audio('sound_gameMusic', 'assets/audio/game.mp3');
         game.load.audio('sound_explosion', 'assets/audio/explosion.mp3');
         game.load.audio('sound_blaster', 'assets/audio/blaster.mp3');
     }
@@ -58,8 +59,14 @@ class GameState extends Phaser.State {
         this.fireButton = this.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
 
         // Create sounds
+        this.sound_gameMusic = game.add.audio('sound_gameMusic');
         this.sound_explosion = game.add.audio('sound_explosion');
         this.sound_blaster = game.add.audio('sound_blaster');
+        this.sound_gameMusic.volume = 0.2;
+        this.sound_gameMusic.loop = true;
+        this.sound_explosion.volume = 0.2;
+        this.sound_blaster.volume = 0.2;
+        this.sound_gameMusic.play();
 
         // Camera settings
         game.camera.follow(this.player);
