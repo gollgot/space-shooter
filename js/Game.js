@@ -5,5 +5,6 @@ class Game extends Phaser.Game {
         super(1000, 700, Phaser.AUTO, "game");
         this.state.add('menuState', menuState);
         this.state.add('gameState', gameState);
+        this.state.add('gameOverState', gameOverState);
     }
 }

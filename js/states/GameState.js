@@ -210,6 +210,15 @@ class GameState extends Phaser.State {
             }
             count++;
         });
+
+        // Player dead
+        if(this.playerLife == 0){
+            // Launch the game over state
+            game.state.start("gameOverState", true, false, this.score);
+            // - 2nd parameter clear the world cache (custom object)
+            // - 3rd NOT clear the cache (loaded assets)
+            // - 4th is parameter we want to pass to the next state
+        }
     }
 
     bulletsHitMeteor(bullet, meteor){
