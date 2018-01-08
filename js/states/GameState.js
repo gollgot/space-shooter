@@ -19,6 +19,7 @@ class GameState extends Phaser.State {
 
         // Sounds
         game.load.audio('sound_gameMusic', 'assets/audio/game.mp3');
+        game.load.audio('sound_gem', 'assets/audio/gem.mp3');
         game.load.audio('sound_explosion', 'assets/audio/explosion.mp3');
         game.load.audio('sound_blaster', 'assets/audio/blaster.mp3');
     }
@@ -104,10 +105,12 @@ class GameState extends Phaser.State {
 
         // SOUNDS
         this.sound_gameMusic = game.add.audio('sound_gameMusic');
+        this.sound_gem = game.add.audio('sound_gem');
         this.sound_explosion = game.add.audio('sound_explosion');
         this.sound_blaster = game.add.audio('sound_blaster');
         this.sound_gameMusic.volume = 0.2;
         this.sound_gameMusic.loop = true;
+        this.sound_gem.volume = 0.2;
         this.sound_explosion.volume = 0.2;
         this.sound_blaster.volume = 0.2;
         this.sound_gameMusic.play();
@@ -192,6 +195,7 @@ class GameState extends Phaser.State {
     }
 
     catchGem(player, gem){
+        this.sound_gem.play();
         gem.kill();
         this.score += 50;
         this.catchingGems ++;
