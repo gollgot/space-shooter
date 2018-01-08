@@ -16,6 +16,7 @@ class GameState extends Phaser.State {
         game.load.image('unmuted', 'assets/img/buttons/unmuted.png');
         game.load.image('muted', 'assets/img/buttons/muted.png');
         game.load.spritesheet('gems', 'assets/img/game/gems.png', 80, 80);
+        game.load.image('life', 'assets/img/game/life.png');
 
         // Sounds
         game.load.audio('sound_gameMusic', 'assets/audio/game.mp3');
@@ -35,9 +36,6 @@ class GameState extends Phaser.State {
 
 
         // GEMS
-        this.gemImg = game.add.sprite(15, 50, 'gems');
-        this.gemImg.fixedToCamera = true;
-        this.gemImg.scale.setTo(0.3, 0.3);
         this.gems = game.add.group();
         this.gems.enableBody = true;
         this.gems.physicsBodyType = Phaser.Physics.ARCADE;
@@ -55,6 +53,7 @@ class GameState extends Phaser.State {
         this.player.body.collideWorldBounds = true;
         this.player.body.maxVelocity.set(200);
         this.player.angle -= 90;
+        this.playerLife = 3;
 
 
         // WEAPON
@@ -93,14 +92,24 @@ class GameState extends Phaser.State {
         this.muted.events.onInputDown.add(this.unmuteTheGame, this);
 
 
-        // TEXTS DISPLAYED
+        // HUD
         // Score
         this.score = 0;
         this.txtScore = game.add.text(15, 15, "Score "+this.score, { font: "24px Arial", fill:"#FFF",  align: "center" });
         this.txtScore.fixedToCamera = true;
         // Catching gems
+        this.gemImg = game.add.sprite(15, 50, 'gems');
+        this.gemImg.fixedToCamera = true;
+        this.gemImg.scale.setTo(0.3, 0.3);
         this.txtCatchingGems = game.add.text(45, 50, this.catchingGems+" / "+this.totalGems, { font: "22px Arial", fill:"#FFF",  align: "center" });
         this.txtCatchingGems.fixedToCamera = true;
+        // Lives - Added 3 lives
+        this.lives = game.add.group();
+        for (var i = 0; i < this.playerLife; i++) {
+            let life = game.add.sprite(this.deadZone.centerX - (33+10+16) + (i*33) + (i*10), 15, 'life'); // Calculate position to place all 3 lives in center of the screen
+            life.fixedToCamera = true;
+            this.lives.add(life);
+        }
 
 
         // SOUNDS
@@ -124,8 +133,10 @@ class GameState extends Phaser.State {
     update(){
         // Set the collision detection between gems and player
         game.physics.arcade.overlap(this.player, this.gems, this.catchGem, null, this);
+        // Set the collision detection between player and meteors
+        game.physics.arcade.overlap(this.player, this.meteors, this.playerHitMeteor, null, this);
         // Set the collision detection between bullets and meteors
-        game.physics.arcade.overlap(this.weapon.bullets, this.meteors, this.hitMeteor, null, this);
+        game.physics.arcade.overlap(this.weapon.bullets, this.meteors, this.bulletsHitMeteor, null, this);
 
         // Update the score and catching gems texts
         this.txtScore.setText("Score "+this.score);
@@ -181,7 +192,27 @@ class GameState extends Phaser.State {
         }
     }
 
-    hitMeteor(bullet, meteor){
+    catchGem(player, gem){
+        this.sound_gem.play();
+        gem.kill();
+        this.score += 50;
+        this.catchingGems ++;
+    }
+
+    playerHitMeteor(player, meteor){
+        meteor.kill();
+        // Remove the last life img on the HUD and remove one playerLife
+        let count = 1;
+        this.lives.forEachAlive(function(life){
+            if(count == self.gameState.playerLife){
+                life.kill();
+                self.gameState.playerLife --;
+            }
+            count++;
+        });
+    }
+
+    bulletsHitMeteor(bullet, meteor){
         bullet.kill();
         meteor.kill();
         // Explosion
@@ -192,13 +223,6 @@ class GameState extends Phaser.State {
         explode.killOnComplete = true;
         explosion.animations.play('explode', 20);
         this.sound_explosion.play();
-    }
-
-    catchGem(player, gem){
-        this.sound_gem.play();
-        gem.kill();
-        this.score += 50;
-        this.catchingGems ++;
     }
 
     // Let the sprite reappears at the other side of the world if he touches the world limit
