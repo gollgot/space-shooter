@@ -53,7 +53,7 @@ class GameState extends Phaser.State {
         this.player.body.collideWorldBounds = true;
         this.player.body.maxVelocity.set(200);
         this.player.angle -= 90;
-        this.playerLife = 3;
+        this.playerLife = 1;
 
 
         // WEAPON
@@ -207,12 +207,21 @@ class GameState extends Phaser.State {
             if(count == self.gameState.playerLife){
                 life.kill();
                 self.gameState.playerLife --;
+                // Display explosion animation
+                let explosion = game.add.sprite(meteor.x, meteor.y, 'explosion');
+                explosion.anchor.setTo(0.5, 0.5);
+                explosion.scale.setTo(1.5, 1.5);
+                let explode = explosion.animations.add('explode');
+                explode.killOnComplete = true;
+                explosion.animations.play('explode', 20);
+                self.gameState.sound_explosion.play();
             }
             count++;
         });
 
         // Player dead
         if(this.playerLife == 0){
+            this.sound_gameMusic.stop();
             // Launch the game over state
             game.state.start("gameOverState", true, false, this.score);
             // - 2nd parameter clear the world cache (custom object)
