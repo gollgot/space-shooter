@@ -29,18 +29,23 @@ class GameState extends Phaser.State {
         // Background (all the world)
         game.add.tileSprite(0, 0, 1500, 1500, 'background');
         game.world.setBounds(0, 0, 1500, 1500);
+        // Phsysics
+        game.physics.startSystem(Phaser.Physics.ARCADE);
 
 
-        //  Add gems group
+        // GEMS
+        this.gemImg = game.add.sprite(15, 50, 'gems');
+        this.gemImg.fixedToCamera = true;
+        this.gemImg.scale.setTo(0.3, 0.3);
         this.gems = game.add.group();
         this.gems.enableBody = true;
         this.gems.physicsBodyType = Phaser.Physics.ARCADE;
-        this.createGems(this.gems);
+        this.totalGems = 10;
+        this.catchingGems = 0;
+        this.createGems(this.gems, this.totalGems);
 
 
-        // Start the physics
-        game.physics.startSystem(Phaser.Physics.ARCADE);
-
+        // PLAYER
         // Create the player / set the anchor at the center of the sprite / Enable the physics on it / collide with world bounds
         this.player = game.add.sprite(game.world.centerX, game.world.centerY, 'player');
         this.player.animations.add('propulse', [1, 2, 3], 30, true); // frames for anim, rate FPS, true for looping
@@ -50,7 +55,8 @@ class GameState extends Phaser.State {
         this.player.body.maxVelocity.set(200);
         this.player.angle -= 90;
 
-        // Create a weapon
+
+        // WEAPON
         this.weapon = game.add.weapon(30, 'bullet');
         //  The bullet will be automatically killed when it leaves the world bounds
         this.weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
@@ -60,18 +66,20 @@ class GameState extends Phaser.State {
         //  Tell the Weapon to track the 'player' Sprite | set a little offset | true to track sprite rotation
         this.weapon.trackSprite(this.player, 60, 0, true);
 
-         //  Add meteors group
+
+         // METEORS
         this.meteors = game.add.group();
         this.meteors.enableBody = true;
         this.meteors.physicsBodyType = Phaser.Physics.ARCADE;
         this.createMeteors(this.meteors);
 
 
-        // Create the cursors dor input keyboard
+        // CURSORS (FOR KEYBOARD INPUT)
         this.cursors = game.input.keyboard.createCursorKeys();
         this.fireButton = this.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
 
-        // Sound and no-sound images
+
+        // MUTE / UNMUTE
         this.unmuted = game.add.sprite(953, 15, 'unmuted');
         this.unmuted.fixedToCamera = true;
         this.unmuted.inputEnabled = true;
@@ -83,12 +91,18 @@ class GameState extends Phaser.State {
         this.muted.inputEnabled = true;
         this.muted.events.onInputDown.add(this.unmuteTheGame, this);
 
-        // Text displayed
+
+        // TEXTS DISPLAYED
+        // Score
         this.score = 0;
         this.txtScore = game.add.text(15, 15, "Score "+this.score, { font: "24px Arial", fill:"#FFF",  align: "center" });
         this.txtScore.fixedToCamera = true;
+        // Catching gems
+        this.txtCatchingGems = game.add.text(45, 50, this.catchingGems+" / "+this.totalGems, { font: "22px Arial", fill:"#FFF",  align: "center" });
+        this.txtCatchingGems.fixedToCamera = true;
 
-        // Create sounds
+
+        // SOUNDS
         this.sound_gameMusic = game.add.audio('sound_gameMusic');
         this.sound_explosion = game.add.audio('sound_explosion');
         this.sound_blaster = game.add.audio('sound_blaster');
@@ -98,7 +112,8 @@ class GameState extends Phaser.State {
         this.sound_blaster.volume = 0.2;
         this.sound_gameMusic.play();
 
-        // Camera settings
+
+        // CAMERA SETTINGS
         game.camera.follow(this.player);
         game.camera.deadzone = this.deadZone;
     }
@@ -109,8 +124,9 @@ class GameState extends Phaser.State {
         // Set the collision detection between bullets and meteors
         game.physics.arcade.overlap(this.weapon.bullets, this.meteors, this.hitMeteor, null, this);
 
-        // Update the score text
+        // Update the score and catching gems texts
         this.txtScore.setText("Score "+this.score);
+        this.txtCatchingGems.setText(this.catchingGems+" / "+this.totalGems);
 
         // Accelerate when up key is downs
         if (this.cursors.up.isDown){
@@ -153,8 +169,7 @@ class GameState extends Phaser.State {
         }
     }
 
-    createGems(gems){
-        let totalGems = 10;
+    createGems(gems, totalGems){
         for (var x = 0; x < totalGems; x++){
             let gem = new Gem();
             gems.add(gem);
@@ -177,6 +192,7 @@ class GameState extends Phaser.State {
     catchGem(player, gem){
         gem.kill();
         this.score += 10;
+        this.catchingGems ++;
     }
 
     // Let the sprite reappears at the other side of the world if he touches the world limit

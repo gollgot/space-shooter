@@ -1,6 +1,7 @@
 class Meteor extends Phaser.Sprite{
 
     constructor(){
+        // Generate a random number to pick one of my 4 meteors skin
         let randomNumber = Math.floor(Math.random() * 4) + 1;
         super(game, game.world.randomX, game.world.randomY, 'meteor'+randomNumber);
         this.create();
@@ -10,9 +11,9 @@ class Meteor extends Phaser.Sprite{
 
     create(){
         game.physics.enable(this, Phaser.Physics.ARCADE);
-        this.anchor.setTo(0.5, 0.5);
+        this.anchor.setTo(0.5, 0.5); // Set the anchor at the middle of the sprite (not top left cornet)
 
-        // Choose an angle for the meteor rotation
+        // Choose a random angle (rotation) and direction for the meteor
         this.rotationAngle = this.generateRandom(0.2, 1.2, true, true);
         this.newX = this.generateRandom(1, 4, true, true);
         this.newY = this.generateRandom(1, 2, true, true);
@@ -21,6 +22,7 @@ class Meteor extends Phaser.Sprite{
 
 
     update(){
+        // Update the position and rotation
         this.angle += this.rotationAngle;
         this.x = this.x + this.newX;
         this.y = this.y + this.newY;
