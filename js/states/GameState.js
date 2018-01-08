@@ -61,7 +61,7 @@ class GameState extends Phaser.State {
         //  The bullet will be automatically killed when it leaves the world bounds
         this.weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
         this.weapon.bulletSpeed = 600;
-        //  Speed-up the rate of fire, allowing them to shoot 1 bullet every 60ms
+        //  Speed-up the rate of fire, allowing them to shoot 1 bullet every 100ms
         this.weapon.fireRate = 100;
         //  Tell the Weapon to track the 'player' Sprite | set a little offset | true to track sprite rotation
         this.weapon.trackSprite(this.player, 60, 0, true);
@@ -151,6 +151,8 @@ class GameState extends Phaser.State {
         if (this.fireButton.isDown){
             this.weapon.fire();
             this.sound_blaster.play();
+            // Every time we spend to shoot (espace key down) the score decrease
+            this.score --;
         }
 
         // Meteors update
@@ -191,7 +193,7 @@ class GameState extends Phaser.State {
 
     catchGem(player, gem){
         gem.kill();
-        this.score += 10;
+        this.score += 50;
         this.catchingGems ++;
     }
 
