@@ -6,14 +6,18 @@ class MenuState extends Phaser.State {
     preload(){
         // Image
         game.load.image('background','assets/img/backgrounds/bg-game.jpg');
+        game.load.image('title','assets/img/other/game_title.png');
         game.load.spritesheet('btnPlay', 'assets/img/buttons/btn_play.png', 195, 50);
         // Audio
         game.load.audio('sound_music', 'assets/audio/menu.mp3');
     }
 
     create() {
-        // Background (all the world)
+        // Background (all the world) and images
         game.add.tileSprite(0, 0, 1000, 700, 'background');
+        this.title = game.add.sprite(game.world.centerX, 100, 'title');
+        this.title.anchor.set(0.5, 0.5);
+
         // BUTTON
         // last tree params are spriteposition for UP, Over, Down
         var btnPlay = game.add.button(game.world.centerX, game.world.centerY, 'btnPlay', this.btnPlayOnClick, this, 0, 0, 0);
