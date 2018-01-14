@@ -5,7 +5,6 @@ class GameState extends Phaser.State {
 
     preload(){
         // Game images
-        game.load.image('background','assets/img/backgrounds/bg-game.jpg');
         game.load.spritesheet('player', 'assets/img/game/player.png', 88, 99, 4); // 5 sprites an each 88 x 99 px
         game.load.image('bullet', 'assets/img/game/bullet.png');
         game.load.image('meteor1','assets/img/game/meteor1.png');
