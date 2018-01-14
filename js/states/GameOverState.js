@@ -1,6 +1,6 @@
 class GameOverState extends Phaser.State {
     init(score){
-        console.log("GameOver score : "+score);
+        this.score = score;
     }
 
     preload(){
@@ -17,9 +17,13 @@ class GameOverState extends Phaser.State {
         this.gameover_title = game.add.sprite(game.world.centerX, 100, 'gameover_title');
         this.gameover_title.anchor.set(0.5, 0.5);
 
+        // TEXTS
+        this.txtScore = game.add.text(game.world.centerX, game.world.centerY - 60, "Votre score : " + this.score, { font: "26px Arial", fill:"#FFF",  align: "center" });
+        this.txtScore.anchor.set(0.5, 0.5); 
+
         // BUTTON
         // last tree params are spriteposition for UP, Over, Down
-        var btnRetry = game.add.button(game.world.centerX, game.world.centerY, 'btnRetry', this.btnRetryOnClick, this, 0, 0, 0);
+        var btnRetry = game.add.button(game.world.centerX, game.world.centerY + 20, 'btnRetry', this.btnRetryOnClick, this, 0, 0, 0);
         btnRetry.anchor.set(0.5, 0.5);
 
         // AUDIO
