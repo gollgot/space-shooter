@@ -95,13 +95,15 @@ class GameState extends Phaser.State {
 
         // HUD
         // Score
-        this.txtScore = game.add.text(15, 15, "Score "+this.score, { font: "24px Arial", fill:"#FFF",  align: "center" });
+        this.txtLevel = game.add.text(15, 15, "Niveau "+this.level, { font: "24px Arial", fill:"#FFF",  align: "center" });
+        this.txtLevel.fixedToCamera = true;
+        this.txtScore = game.add.text(15, 45, "Score "+this.score, { font: "24px Arial", fill:"#FFF",  align: "center" });
         this.txtScore.fixedToCamera = true;
         // Catching gems
-        this.gemImg = game.add.sprite(15, 50, 'gems');
+        this.gemImg = game.add.sprite(15, 80, 'gems');
         this.gemImg.fixedToCamera = true;
         this.gemImg.scale.setTo(0.3, 0.3);
-        this.txtCatchingGems = game.add.text(45, 50, this.catchingGems+" / "+this.totalGems, { font: "22px Arial", fill:"#FFF",  align: "center" });
+        this.txtCatchingGems = game.add.text(45, 80, this.catchingGems+" / "+this.totalGems, { font: "22px Arial", fill:"#FFF",  align: "center" });
         this.txtCatchingGems.fixedToCamera = true;
         // Lives - Added 3 lives
         this.lives = game.add.group();
@@ -132,7 +134,6 @@ class GameState extends Phaser.State {
 
 
     update(){
-        console.log(this.meteors.length);
         // Set the collision detection between gems and player
         game.physics.arcade.overlap(this.player, this.gems, this.catchGem, null, this);
         // Set the collision detection between player and meteors
@@ -208,7 +209,7 @@ class GameState extends Phaser.State {
 
         if(this.catchingGems == this.totalGems){
             this.sound_gameMusic.stop();
-            game.state.start("gameState", true, false, this.level++, this.playerLife, this.score);
+            game.state.start("gameState", true, false, this.level + 1, this.playerLife, this.score);
         // - 2nd parameter clear the world cache (custom object)
         // - 3rd NOT clear the cache (loaded assets)
         // Params : 1) level 2) lives 3) score
@@ -239,7 +240,7 @@ class GameState extends Phaser.State {
         if(this.playerLife == 0){
             this.sound_gameMusic.stop();
             // Launch the game over state
-            game.state.start("gameOverState", true, false, this.score);
+            game.state.start("gameOverState", true, false, this.score, this.level);
             // - 2nd parameter clear the world cache (custom object)
             // - 3rd NOT clear the cache (loaded assets)
             // - 4th is parameter we want to pass to the next state
