@@ -39,7 +39,8 @@ class GameOverState extends Phaser.State {
     btnRetryOnClick () {
         this.sound_music.stop();
         // Launch the game state
-        game.state.start("gameState", true, false);
+        game.state.start("gameState", true, false, 1, 3, 0);
+        // Params : 1) level 2) lives 3) score
     }
 
 }

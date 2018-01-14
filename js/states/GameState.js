@@ -1,6 +1,8 @@
 class GameState extends Phaser.State {
-    init(){
-        console.log("GameState INIT");
+    init(level, playerLife, score){
+        this.level = level;
+        this.playerLife  = playerLife;
+        this.score = score;
     }
 
     preload(){
@@ -38,7 +40,7 @@ class GameState extends Phaser.State {
         this.gems = game.add.group();
         this.gems.enableBody = true;
         this.gems.physicsBodyType = Phaser.Physics.ARCADE;
-        this.totalGems = 10;
+        this.totalGems = 5;
         this.catchingGems = 0;
         this.createGems(this.gems, this.totalGems);
 
@@ -52,7 +54,6 @@ class GameState extends Phaser.State {
         this.player.body.collideWorldBounds = true;
         this.player.body.maxVelocity.set(200);
         this.player.angle -= 90;
-        this.playerLife = 1;
 
 
         // WEAPON
@@ -70,7 +71,8 @@ class GameState extends Phaser.State {
         this.meteors = game.add.group();
         this.meteors.enableBody = true;
         this.meteors.physicsBodyType = Phaser.Physics.ARCADE;
-        this.createMeteors(this.meteors);
+        this.createMeteors(this.meteors, 2);
+        this.creationMeteorProcess();
 
 
         // CURSORS (FOR KEYBOARD INPUT)
@@ -93,7 +95,6 @@ class GameState extends Phaser.State {
 
         // HUD
         // Score
-        this.score = 0;
         this.txtScore = game.add.text(15, 15, "Score "+this.score, { font: "24px Arial", fill:"#FFF",  align: "center" });
         this.txtScore.fixedToCamera = true;
         // Catching gems
@@ -129,7 +130,9 @@ class GameState extends Phaser.State {
         game.camera.deadzone = this.deadZone;
     }
 
+
     update(){
+        console.log(this.meteors.length);
         // Set the collision detection between gems and player
         game.physics.arcade.overlap(this.player, this.gems, this.catchGem, null, this);
         // Set the collision detection between player and meteors
@@ -143,7 +146,7 @@ class GameState extends Phaser.State {
 
         // Accelerate when up key is downs
         if (this.cursors.up.isDown){
-            game.physics.arcade.accelerationFromRotation(this.player.rotation, 800, this.player.body.acceleration);
+            game.physics.arcade.accelerationFromRotation(this.player.rotation, 900, this.player.body.acceleration);
             this.player.animations.play('propulse'); // true for looping when finish
         }else{
             this.player.body.acceleration.set(0);
@@ -164,8 +167,6 @@ class GameState extends Phaser.State {
         if (this.fireButton.isDown){
             this.weapon.fire();
             this.sound_blaster.play();
-            // Every time we spend to shoot (espace key down) the score decrease
-            this.score --;
         }
 
         // Meteors update
@@ -176,12 +177,20 @@ class GameState extends Phaser.State {
         });
     }
 
-    createMeteors(meteors){
-        let totalMeteors = 5;
-        for (var x = 0; x < totalMeteors; x++){
+    createMeteors(meteors, nb){
+        for (var x = 0; x < nb; x++){
             let meteor = new Meteor();
             meteors.add(meteor);
         }
+    }
+
+    // Each 2 seconds, create 2 more meteors
+    creationMeteorProcess(){
+        window.setInterval(function(){
+            if(self.gameState.playerLife > 0){
+                self.gameState.createMeteors(self.gameState.meteors, 1);
+            }
+        }, 4000);
     }
 
     createGems(gems, totalGems){
@@ -196,6 +205,14 @@ class GameState extends Phaser.State {
         gem.kill();
         this.score += 50;
         this.catchingGems ++;
+
+        if(this.catchingGems == this.totalGems){
+            this.sound_gameMusic.stop();
+            game.state.start("gameState", true, false, this.level++, this.playerLife, this.score);
+        // - 2nd parameter clear the world cache (custom object)
+        // - 3rd NOT clear the cache (loaded assets)
+        // Params : 1) level 2) lives 3) score
+        }
     }
 
     playerHitMeteor(player, meteor){
