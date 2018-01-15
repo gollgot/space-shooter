@@ -187,7 +187,7 @@ class GameState extends Phaser.State {
 
     // Each 2 seconds, create 2 more meteors
     creationMeteorProcess(){
-        window.setInterval(function(){
+        this.meteorProcess = window.setInterval(function(){
             if(self.gameState.playerLife > 0){
                 self.gameState.createMeteors(self.gameState.meteors, 1);
             }
@@ -207,8 +207,9 @@ class GameState extends Phaser.State {
         this.score += 50;
         this.catchingGems ++;
 
-        if(this.catchingGems == this.totalGems){
+        if(this.catchingGems == 1){
             this.sound_gameMusic.stop();
+            clearInterval(this.meteorProcess);
             game.state.start("gameState", true, false, this.level + 1, this.playerLife, this.score);
         // - 2nd parameter clear the world cache (custom object)
         // - 3rd NOT clear the cache (loaded assets)
@@ -239,6 +240,7 @@ class GameState extends Phaser.State {
         // Player dead
         if(this.playerLife == 0){
             this.sound_gameMusic.stop();
+            clearInterval(this.meteorProcess);
             // Launch the game over state
             game.state.start("gameOverState", true, false, this.score, this.level);
             // - 2nd parameter clear the world cache (custom object)
@@ -250,6 +252,7 @@ class GameState extends Phaser.State {
     bulletsHitMeteor(bullet, meteor){
         bullet.kill();
         meteor.kill();
+        this.meteors.remove(meteor);
         // Explosion
         let explosion = game.add.sprite(meteor.x, meteor.y, 'explosion');
         explosion.anchor.setTo(0.5, 0.5);
