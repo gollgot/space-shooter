@@ -1,10 +1,8 @@
 class MenuState extends Phaser.State {
-    init(){
-        console.log("MenuState INIT");
-    }
 
+    // Load all the assets
     preload(){
-        // Image
+        // Images
         game.load.image('background','assets/img/backgrounds/bg-game.jpg');
         game.load.image('title','assets/img/other/game_title.png');
         game.load.spritesheet('btnPlay', 'assets/img/buttons/btn_play.png', 195, 50);
@@ -13,13 +11,13 @@ class MenuState extends Phaser.State {
     }
 
     create() {
-        // Background (all the world) and images
+        // Background and title
         game.add.tileSprite(0, 0, 1000, 700, 'background');
         this.title = game.add.sprite(game.world.centerX, 100, 'title');
         this.title.anchor.set(0.5, 0.5);
 
         // BUTTON
-        // last tree params are spriteposition for UP, Over, Down
+        // last tree params are sprite position for UP, Over, Down
         var btnPlay = game.add.button(game.world.centerX, game.world.centerY, 'btnPlay', this.btnPlayOnClick, this, 0, 0, 0);
         btnPlay.anchor.set(0.5, 0.5);
 
@@ -30,15 +28,15 @@ class MenuState extends Phaser.State {
         this.sound_music.play();
     }
 
-    update(){
-
-    }
-
     btnPlayOnClick () {
         this.sound_music.stop();
+        /*
+         * Start the gameState
+         * Param1: state id
+         * Param2 : clear the world cache (object etc.)
+         * Param3 : Clear the cache (assets etc.)
+         * param 4 - 5 - 6 : Game level / Player lives / Score
+         */
         game.state.start("gameState", true, false, 1, 3, 0);
-        // - 2nd parameter clear the world cache (custom object)
-        // - 3rd NOT clear the cache (loaded assets)
-        // Params : 1) level 2) lives 3) score
     }
 }

@@ -1,10 +1,13 @@
 class GameState extends Phaser.State {
+
+    // State initialisation, get params passed from the previous state
     init(level, playerLife, score){
         this.level = level;
         this.playerLife  = playerLife;
         this.score = score;
     }
 
+    // Load all the assets
     preload(){
         // Game images
         game.load.spritesheet('player', 'assets/img/game/player.png', 88, 99, 4); // 5 sprites an each 88 x 99 px
@@ -29,14 +32,14 @@ class GameState extends Phaser.State {
     create() {
         // Create the deadzone (zone in center that the player can move)
         this.deadZone = new Phaser.Rectangle(200, 200, 600, 300);
-        // Background (all the world)
+        // Create the world (background and world bounds)
         game.add.tileSprite(0, 0, 1500, 1500, 'background');
         game.world.setBounds(0, 0, 1500, 1500);
         // Phsysics
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
 
-        // GEMS
+        // GEMS (create a group of X gems and display them randomly in the world)
         this.gems = game.add.group();
         this.gems.enableBody = true;
         this.gems.physicsBodyType = Phaser.Physics.ARCADE;
@@ -57,7 +60,7 @@ class GameState extends Phaser.State {
 
 
         // WEAPON
-        this.weapon = game.add.weapon(30, 'bullet');
+        this.weapon = game.add.weapon(30, 'bullet'); // 30 bullet max on the screen
         //  The bullet will be automatically killed when it leaves the world bounds
         this.weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
         this.weapon.bulletSpeed = 600;
@@ -69,15 +72,13 @@ class GameState extends Phaser.State {
 
          // METEORS
         this.meteors = game.add.group();
-        this.meteors.enableBody = true;
-        this.meteors.physicsBodyType = Phaser.Physics.ARCADE;
-        this.createMeteors(this.meteors, 2);
-        this.creationMeteorProcess();
+        this.createMeteors(this.meteors, 3);
+        this.creationMeteorProcess(); // Launch the process which will create each 3sec 1 more meteor
 
 
-        // CURSORS (FOR KEYBOARD INPUT)
-        this.cursors = game.input.keyboard.createCursorKeys();
-        this.fireButton = this.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
+        // CURSORS (FOR KEYBOARD INPUT) and fireButton
+        this.cursors = game.input.keyboard.createCursorKeys(); //used to manage keyboard input in update method
+        this.fireButton = this.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR); // Spacebar is the firebutton
 
 
         // MUTE / UNMUTE
@@ -132,8 +133,9 @@ class GameState extends Phaser.State {
         game.camera.deadzone = this.deadZone;
     }
 
-
+    // game loop (called 60 times per second)
     update(){
+        // COLLISONS MANAGER
         // Set the collision detection between gems and player
         game.physics.arcade.overlap(this.player, this.gems, this.catchGem, null, this);
         // Set the collision detection between player and meteors
@@ -141,15 +143,21 @@ class GameState extends Phaser.State {
         // Set the collision detection between bullets and meteors
         game.physics.arcade.overlap(this.weapon.bullets, this.meteors, this.bulletsHitMeteor, null, this);
 
+
+        // SCORE MANAGER
         // Update the score and catching gems texts
         this.txtScore.setText("Score "+this.score);
         this.txtCatchingGems.setText(this.catchingGems+" / "+this.totalGems);
 
+
+        // KEYBOARD INPUT
         // Accelerate when up key is downs
         if (this.cursors.up.isDown){
             game.physics.arcade.accelerationFromRotation(this.player.rotation, 900, this.player.body.acceleration);
-            this.player.animations.play('propulse'); // true for looping when finish
-        }else{
+            this.player.animations.play('propulse'); // Animate the player to show engine fire
+        }
+        // Stop acceleration and animation when key up
+        else{
             this.player.body.acceleration.set(0);
             this.player.frame = 0;
         }
@@ -163,7 +171,6 @@ class GameState extends Phaser.State {
             this.player.body.angularVelocity = 0;
         }
 
-
         // Shoot
         if (this.fireButton.isDown){
             this.weapon.fire();
@@ -172,12 +179,14 @@ class GameState extends Phaser.State {
 
         // Meteors update
         this.meteors.forEachAlive(function(meteor){
-            meteor.update();
+            meteor.update(); // Call the update method for each meteor, to update their position and rotation
             // Reappears at the other side of the world if touch limits
             self.gameState.screenWrap(meteor);
         });
     }
 
+
+    // Create a number of meteor and add them into the meteors group
     createMeteors(meteors, nb){
         for (var x = 0; x < nb; x++){
             let meteor = new Meteor();
@@ -185,15 +194,16 @@ class GameState extends Phaser.State {
         }
     }
 
-    // Each 2 seconds, create 2 more meteors
+    // Each 3 seconds, create 1 more meteors
     creationMeteorProcess(){
         this.meteorProcess = window.setInterval(function(){
             if(self.gameState.playerLife > 0){
                 self.gameState.createMeteors(self.gameState.meteors, 1);
             }
-        }, 4000);
+        }, 3000);
     }
 
+    // Create a number of gems and add them into the gems group
     createGems(gems, totalGems){
         for (var x = 0; x < totalGems; x++){
             let gem = new Gem();
@@ -201,31 +211,41 @@ class GameState extends Phaser.State {
         }
     }
 
+    // Catch a gem (called when collide occure between player and gem)
     catchGem(player, gem){
         this.sound_gem.play();
         gem.kill();
+        this.gems.remove(gem);
         this.score += 50;
         this.catchingGems ++;
 
+        // Catching all the available gems
         if(this.catchingGems == this.totalGems){
             this.sound_gameMusic.stop();
-            clearInterval(this.meteorProcess);
+            clearInterval(this.meteorProcess); // Stop the generation of meteor (mandatory because this is an event on the windows, so when we launch the new gameState (lvl2) a new generation of meteor will be called)
+             /*
+             * Start the gameState
+             * Param1: state id
+             * Param2 : clear the world cache (object etc.)
+             * Param3 : Clear the cache (assets etc.)
+             * param 4 - 5 - 6 : Game level / Player lives / Score
+             */
             game.state.start("gameState", true, false, this.level + 1, this.playerLife, this.score);
-        // - 2nd parameter clear the world cache (custom object)
-        // - 3rd NOT clear the cache (loaded assets)
-        // Params : 1) level 2) lives 3) score
         }
     }
 
+    // Hitting meteor (player)
     playerHitMeteor(player, meteor){
+        // Kill and remove current meteor
         meteor.kill();
+        this.meteors.remove(meteor);
         // Remove the last life img on the HUD and remove one playerLife
         let count = 1;
         this.lives.forEachAlive(function(life){
             if(count == self.gameState.playerLife){
                 life.kill();
                 self.gameState.playerLife --;
-                // Display explosion animation
+                // Create and display explosion animation at the current meteor position
                 let explosion = game.add.sprite(meteor.x, meteor.y, 'explosion');
                 explosion.anchor.setTo(0.5, 0.5);
                 explosion.scale.setTo(1.5, 1.5);
@@ -240,20 +260,25 @@ class GameState extends Phaser.State {
         // Player dead
         if(this.playerLife == 0){
             this.sound_gameMusic.stop();
-            clearInterval(this.meteorProcess);
-            // Launch the game over state
+            clearInterval(this.meteorProcess); // Stop the generation of meteor (mandatory because this is an event on the windows, so when we launch the new gameState (lvl2) a new generation of meteor will be called)
+            /*
+             * Start the gameOver state
+             * Param1: state id
+             * Param2 : clear the world cache (object etc.)
+             * Param3 : Clear the cache (assets etc.)
+             * param 4 - 5 : Score / Game level reached
+             */
             game.state.start("gameOverState", true, false, this.score, this.level);
-            // - 2nd parameter clear the world cache (custom object)
-            // - 3rd NOT clear the cache (loaded assets)
-            // - 4th is parameter we want to pass to the next state
         }
     }
 
+    // Hitting meteor (weapon's bullets)
     bulletsHitMeteor(bullet, meteor){
         bullet.kill();
+        // kill and remove current meteor
         meteor.kill();
         this.meteors.remove(meteor);
-        // Explosion
+        // Create and display explosion animation at the current meteor position
         let explosion = game.add.sprite(meteor.x, meteor.y, 'explosion');
         explosion.anchor.setTo(0.5, 0.5);
         explosion.scale.setTo(1.5, 1.5);

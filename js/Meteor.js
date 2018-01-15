@@ -7,8 +7,6 @@ class Meteor extends Phaser.Sprite{
         this.create();
     }
 
-
-
     create(){
         game.physics.enable(this, Phaser.Physics.ARCADE);
         this.anchor.setTo(0.5, 0.5); // Set the anchor at the middle of the sprite (not top left cornet)
@@ -19,18 +17,15 @@ class Meteor extends Phaser.Sprite{
         this.newY = this.generateRandom(1, 2, true, true);
     }
 
-
-
+    // Called from the update method of GameState.update() (60 times per second)
     update(){
-        // Update the position and rotation
+        // Update the position and rotation of the meteor
         this.angle += this.rotationAngle;
         this.x = this.x + this.newX;
         this.y = this.y + this.newY;
     }
 
-
-
-    // Gennerate a random number between the min and max (inclusive) and possible to have float number and negative
+    // Generate a random number between the min and max (inclusive) and possible to have float number and negative
     generateRandom(min, max, float, negative){
         let result = 0;
         // user want a float number
