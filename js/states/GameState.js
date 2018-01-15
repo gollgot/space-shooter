@@ -207,7 +207,7 @@ class GameState extends Phaser.State {
         this.score += 50;
         this.catchingGems ++;
 
-        if(this.catchingGems == 1){
+        if(this.catchingGems == this.totalGems){
             this.sound_gameMusic.stop();
             clearInterval(this.meteorProcess);
             game.state.start("gameState", true, false, this.level + 1, this.playerLife, this.score);

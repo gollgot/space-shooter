@@ -36,7 +36,7 @@ class MenuState extends Phaser.State {
 
     btnPlayOnClick () {
         this.sound_music.stop();
-        game.state.start("gameState", true, false, 1, 25, 0);
+        game.state.start("gameState", true, false, 1, 3, 0);
         // - 2nd parameter clear the world cache (custom object)
         // - 3rd NOT clear the cache (loaded assets)
         // Params : 1) level 2) lives 3) score
